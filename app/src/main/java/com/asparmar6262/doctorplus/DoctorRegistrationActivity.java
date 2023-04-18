@@ -8,12 +8,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,42 +24,40 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.net.URI;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class PatientRegistrationActivity extends AppCompatActivity {
+public class DoctorRegistrationActivity extends AppCompatActivity {
+    EditText email,password,doctorName,doctorAge;
     CircleImageView profilePic;
-    EditText email,password,patientName,patientAge;
     Button register;
     TextView hasAccount;
     ProgressBar progressBar;
-    Uri imageUri;
-
     FirebaseAuth mAuth;
+
+    Uri imageUri;
 
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference;
-    Patient patient;
+    Doctor doctor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_patient_registration);
+        setContentView(R.layout.activity_doctor_registration);
 
+        doctorName = findViewById(R.id.DoctorName);
+        doctorAge = findViewById(R.id.DoctorAge);
         hasAccount = findViewById(R.id.hasAccount);
         email = findViewById(R.id.email);
         password = findViewById(R.id.password);
-        register = findViewById(R.id.register);
         profilePic = findViewById(R.id.profilePic);
-        patientName = findViewById(R.id.patientName);
-        patientAge = findViewById(R.id.patientAge);
+        register = findViewById(R.id.register);
         progressBar = findViewById(R.id.progressBar);
         mAuth = FirebaseAuth.getInstance();
 
         //real_time database setup
         firebaseDatabase = FirebaseDatabase.getInstance();
-        databaseReference = firebaseDatabase.getReference("Patient");
+        databaseReference = firebaseDatabase.getReference("Doctor");
 
         //profile pic work
         profilePic.setOnClickListener(new View.OnClickListener() {
@@ -75,7 +70,7 @@ public class PatientRegistrationActivity extends AppCompatActivity {
         hasAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(PatientRegistrationActivity.this,LoginActivity.class);
+                Intent intent = new Intent(DoctorRegistrationActivity.this,LoginActivity.class);
                 startActivity(intent);
             }
         });
@@ -110,14 +105,13 @@ public class PatientRegistrationActivity extends AppCompatActivity {
 
     }
 
-
     private void registerNewUser() {
         progressBar.setVisibility(View.VISIBLE);
         String GivenEmail,GivenPassword,GivenName,GivenAge,image;
         GivenEmail = email.getText().toString().trim();
         GivenPassword = password.getText().toString().trim();
-        GivenName = patientName.getText().toString().trim();
-        GivenAge = patientAge.getText().toString().trim();
+        GivenName = doctorName.getText().toString().trim();
+        GivenAge = doctorAge.getText().toString().trim();
         image = imageUri.toString();
 
 
@@ -140,7 +134,7 @@ public class PatientRegistrationActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
                     Toast.makeText(getApplicationContext(),"Registration Successful",Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(PatientRegistrationActivity.this,MainActivity.class);
+                    Intent intent = new Intent(DoctorRegistrationActivity.this,MainActivity.class);
                     startActivity(intent);
                     addDatatoFirebase(GivenName,GivenAge,GivenEmail,GivenPassword,image);
                     progressBar.setVisibility(View.GONE);
@@ -154,18 +148,18 @@ public class PatientRegistrationActivity extends AppCompatActivity {
     }
 
     private void addDatatoFirebase(String givenName, String givenAge, String givenEmail, String givenPassword, String image) {
-        patient = new Patient(givenName,givenAge,givenEmail,givenPassword,image);
+        doctor = new Doctor(givenName,givenAge,givenEmail,givenPassword,image);
 
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                databaseReference.setValue(patient);
+                databaseReference.setValue(doctor);
                 Toast.makeText(getApplicationContext(), "data added Successfully", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(PatientRegistrationActivity.this, "failed to add Data !", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "failed to add Data !", Toast.LENGTH_SHORT).show();
             }
         });
     }

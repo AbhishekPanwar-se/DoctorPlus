@@ -21,7 +21,7 @@ public class SignUpActivity extends AppCompatActivity {
         doctorSignup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(SignUpActivity.this,DoctorRegistrationPage.class);
+                Intent intent = new Intent(SignUpActivity.this, DoctorRegistrationActivity.class);
                 startActivity(intent);
             }
         });
