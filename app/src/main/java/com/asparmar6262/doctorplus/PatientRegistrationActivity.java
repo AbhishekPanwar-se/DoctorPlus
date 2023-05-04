@@ -33,7 +33,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class PatientRegistrationActivity extends AppCompatActivity {
     CircleImageView profilePic;
-    EditText email,password,patientName,patientAge;
+    EditText email,password,patientName,patientAge,patientMobileNo;
     Button register;
     TextView hasAccount;
     ProgressBar progressBar;
@@ -57,12 +57,13 @@ public class PatientRegistrationActivity extends AppCompatActivity {
         profilePic = findViewById(R.id.profilePic);
         patientName = findViewById(R.id.patientName);
         patientAge = findViewById(R.id.patientAge);
+        patientMobileNo = findViewById(R.id.patientMobileNo);
         progressBar = findViewById(R.id.progressBar);
         mAuth = FirebaseAuth.getInstance();
 
         //real_time database setup
         firebaseDatabase = FirebaseDatabase.getInstance();
-        databaseReference = firebaseDatabase.getReference("Patient");
+        databaseReference = firebaseDatabase.getReference("users");
 
         //profile pic work
         profilePic.setOnClickListener(new View.OnClickListener() {
@@ -113,25 +114,18 @@ public class PatientRegistrationActivity extends AppCompatActivity {
 
     private void registerNewUser() {
         progressBar.setVisibility(View.VISIBLE);
-        String GivenEmail,GivenPassword,GivenName,GivenAge,image;
+        String GivenEmail,GivenPassword,GivenName,GivenAge,GivenMobileNo,GivenImage;
         GivenEmail = email.getText().toString().trim();
         GivenPassword = password.getText().toString().trim();
         GivenName = patientName.getText().toString().trim();
         GivenAge = patientAge.getText().toString().trim();
-        image = imageUri.toString();
+        GivenMobileNo = patientMobileNo.getText().toString().trim();
+        GivenImage = imageUri.toString();
 
 
-        if(TextUtils.isEmpty(GivenEmail)){
-            Toast.makeText(getApplicationContext(),"Please Enter Email",Toast.LENGTH_SHORT).show();
-        }
-        if(TextUtils.isEmpty(GivenPassword)){
-            Toast.makeText(getApplicationContext(),"Please enter Password",Toast.LENGTH_SHORT).show();
-        }
-        if(TextUtils.isEmpty(GivenName)){
-            Toast.makeText(getApplicationContext(),"Please enter your Name",Toast.LENGTH_SHORT).show();
-        }
-        if(TextUtils.isEmpty(GivenAge)){
-            Toast.makeText(getApplicationContext(),"Please enter your Age",Toast.LENGTH_SHORT).show();
+        if(TextUtils.isEmpty(GivenEmail) || TextUtils.isEmpty(GivenPassword) || TextUtils.isEmpty(GivenName) || TextUtils.isEmpty(GivenAge) || TextUtils.isEmpty(GivenMobileNo) || TextUtils.isEmpty(GivenImage)){
+            Toast.makeText(getApplicationContext(),"Please Enter valid details",Toast.LENGTH_SHORT).show();
+            return;
         }
 
 
@@ -142,7 +136,7 @@ public class PatientRegistrationActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(),"Registration Successful",Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(PatientRegistrationActivity.this,MainActivity.class);
                     startActivity(intent);
-                    addDatatoFirebase(GivenName,GivenAge,GivenEmail,GivenPassword,image);
+                    addDatatoFirebase(GivenName,GivenAge,GivenEmail,GivenPassword,GivenImage,GivenMobileNo);
                     progressBar.setVisibility(View.GONE);
                 }
                 else{
@@ -153,13 +147,13 @@ public class PatientRegistrationActivity extends AppCompatActivity {
         });
     }
 
-    private void addDatatoFirebase(String givenName, String givenAge, String givenEmail, String givenPassword, String image) {
-        patient = new Patient(givenName,givenAge,givenEmail,givenPassword,image);
+    private void addDatatoFirebase(String givenName, String givenAge, String givenEmail, String givenPassword, String givenImage, String givenMobileNo) {
+        patient = new Patient(givenName,givenAge,givenEmail,givenPassword,givenImage,givenMobileNo,"patient");
 
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                databaseReference.setValue(patient);
+                databaseReference.child(givenMobileNo).setValue(patient);
                 Toast.makeText(getApplicationContext(), "data added Successfully", Toast.LENGTH_SHORT).show();
             }
 

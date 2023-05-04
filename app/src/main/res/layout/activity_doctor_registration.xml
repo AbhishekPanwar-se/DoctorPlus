@@ -58,10 +58,22 @@
             android:background="@drawable/edit_text_background"/>
 
         <EditText
-            android:id="@+id/DoctorAge"
+            android:id="@+id/DoctorSpecialties"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:hint="Enter your Age"
+            android:hint="Enter your Specialties"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:textAlignment="center"
+            android:textStyle="bold"
+            android:inputType="number"
+            android:background="@drawable/edit_text_background"/>
+
+        <EditText
+            android:id="@+id/DoctorMobileNo"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Enter your Mobile no."
             android:layout_marginTop="2dp"
             android:layout_marginBottom="2dp"
             android:textAlignment="center"

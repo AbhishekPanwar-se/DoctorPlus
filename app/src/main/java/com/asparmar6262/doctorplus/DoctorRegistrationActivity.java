@@ -27,7 +27,7 @@ import com.google.firebase.database.ValueEventListener;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class DoctorRegistrationActivity extends AppCompatActivity {
-    EditText email,password,doctorName,doctorAge;
+    EditText email,password,doctorName,doctorSpecialties,doctorMobileNo;
     CircleImageView profilePic;
     Button register;
     TextView hasAccount;
@@ -46,7 +46,8 @@ public class DoctorRegistrationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_doctor_registration);
 
         doctorName = findViewById(R.id.DoctorName);
-        doctorAge = findViewById(R.id.DoctorAge);
+        doctorSpecialties = findViewById(R.id.DoctorSpecialties);
+        doctorMobileNo = findViewById(R.id.DoctorMobileNo);
         hasAccount = findViewById(R.id.hasAccount);
         email = findViewById(R.id.email);
         password = findViewById(R.id.password);
@@ -57,7 +58,7 @@ public class DoctorRegistrationActivity extends AppCompatActivity {
 
         //real_time database setup
         firebaseDatabase = FirebaseDatabase.getInstance();
-        databaseReference = firebaseDatabase.getReference("Doctor");
+        databaseReference = firebaseDatabase.getReference("users");
 
         //profile pic work
         profilePic.setOnClickListener(new View.OnClickListener() {
@@ -107,25 +108,18 @@ public class DoctorRegistrationActivity extends AppCompatActivity {
 
     private void registerNewUser() {
         progressBar.setVisibility(View.VISIBLE);
-        String GivenEmail,GivenPassword,GivenName,GivenAge,image;
+        String GivenEmail,GivenPassword,GivenName,GivenSpecialties,GivenMobileNo,image;
         GivenEmail = email.getText().toString().trim();
         GivenPassword = password.getText().toString().trim();
         GivenName = doctorName.getText().toString().trim();
-        GivenAge = doctorAge.getText().toString().trim();
+        GivenSpecialties = doctorSpecialties.getText().toString().trim();
+        GivenMobileNo = doctorMobileNo.getText().toString().trim();
         image = imageUri.toString();
 
 
-        if(TextUtils.isEmpty(GivenEmail)){
-            Toast.makeText(getApplicationContext(),"Please Enter Email",Toast.LENGTH_SHORT).show();
-        }
-        if(TextUtils.isEmpty(GivenPassword)){
-            Toast.makeText(getApplicationContext(),"Please enter Password",Toast.LENGTH_SHORT).show();
-        }
-        if(TextUtils.isEmpty(GivenName)){
-            Toast.makeText(getApplicationContext(),"Please enter your Name",Toast.LENGTH_SHORT).show();
-        }
-        if(TextUtils.isEmpty(GivenAge)){
-            Toast.makeText(getApplicationContext(),"Please enter your Age",Toast.LENGTH_SHORT).show();
+        if(TextUtils.isEmpty(GivenEmail) || TextUtils.isEmpty(GivenPassword) || TextUtils.isEmpty(GivenName) || TextUtils.isEmpty(GivenSpecialties) || TextUtils.isEmpty(GivenMobileNo) || image.isEmpty()){
+            Toast.makeText(getApplicationContext(),"Please Enter valid details",Toast.LENGTH_SHORT).show();
+            return;
         }
 
 
@@ -136,7 +130,7 @@ public class DoctorRegistrationActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(),"Registration Successful",Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(DoctorRegistrationActivity.this,MainActivity.class);
                     startActivity(intent);
-                    addDatatoFirebase(GivenName,GivenAge,GivenEmail,GivenPassword,image);
+                    addDatatoFirebase(GivenName,GivenSpecialties,GivenEmail,GivenPassword,GivenMobileNo,image);
                     progressBar.setVisibility(View.GONE);
                 }
                 else{
@@ -147,13 +141,13 @@ public class DoctorRegistrationActivity extends AppCompatActivity {
         });
     }
 
-    private void addDatatoFirebase(String givenName, String givenAge, String givenEmail, String givenPassword, String image) {
-        doctor = new Doctor(givenName,givenAge,givenEmail,givenPassword,image);
+    private void addDatatoFirebase(String givenName, String givenAge, String givenEmail, String givenPassword, String givenMobileNo,String image) {
+        doctor = new Doctor(givenName,givenAge,givenEmail,givenPassword,image,givenMobileNo,"doctor");
 
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                databaseReference.setValue(doctor);
+                databaseReference.child(givenMobileNo).setValue(doctor);
                 Toast.makeText(getApplicationContext(), "data added Successfully", Toast.LENGTH_SHORT).show();
             }
 
